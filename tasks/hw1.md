@@ -34,4 +34,14 @@ main: the script is running!
 <span style="color:red">Только не официальная версия ссылка-</span>
 [nvm for windows](https://github.com/coreybutler/nvm-windows/releases)
 
-<div>После установки обязательно перезагрузить Винду</div>
+<div style="color:green">После установки обязательно перезагрузить Винду</div>
+
+Проверить версию nvm просто прописать в вашем терминале команда: <div style="color:yellow">nvm</div>
+
+Вресии node установленные в вашей среде команда: <div style="color:yellow">nvm ls</div>
+
+Версии node которые существуют глобально команда: <div style="color:yellow">nvm list available</div>
+
+Установка через nvm дополнительной версии node: <div style="color:yellow">nvm install **Ваша версия( например 14.17.0 )**</div>
+
+Переключится на версию: <div style="color:yellow">nvm use **Ваша версия( например 14.17.0 )**</br>node -v</div>
