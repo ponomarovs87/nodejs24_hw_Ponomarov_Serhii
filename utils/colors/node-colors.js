@@ -16,16 +16,6 @@ const styles = {
     cyan: "\x1b[36m",
     white: "\x1b[37m",
   },
-  bgColors: {
-    bgBlack: "\x1b[40m",
-    bgRed: "\x1b[41m",
-    bgGreen: "\x1b[42m",
-    bgYellow: "\x1b[43m",
-    bgBlue: "\x1b[44m",
-    bgMagenta: "\x1b[45m",
-    bgCyan: "\x1b[46m",
-    bgWhite: "\x1b[47m",
-  },
   textStyles: {
     bold: "\x1b[1m",
     dim: "\x1b[2m",
@@ -66,4 +56,4 @@ const useTheme = (text, ...themes) => {
 
 
 
-module.exports = { useTheme, styles };
+module.exports = { useTheme, ...styles };

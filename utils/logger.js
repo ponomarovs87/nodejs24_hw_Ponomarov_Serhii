@@ -1,23 +1,23 @@
-const { useTheme, styles } = require("./colors/node-colors");
+const { useTheme, colors,backgroundColors } = require("./colors/node-colors");
 
 function info(titleText, msg) {
   console.log(
-    useTheme(`${titleText} :`, styles.backgroundColors.bgYellow),
-    useTheme(msg, styles.backgroundColors.bgBlue)
+    useTheme(`${titleText} :`, colors.yellow),
+    useTheme(msg, backgroundColors.bgBlue)
   );
 }
 
 function warn(titleText, msg) {
   console.warn(
-    useTheme(`${titleText} :`, styles.backgroundColors.bgYellow),
-    useTheme(msg, styles.backgroundColors.bgMagenta)
+    useTheme(`${titleText} :`, backgroundColors.bgYellow),
+    useTheme(msg, backgroundColors.bgMagenta)
   );
 }
 
 function error(titleText, msg) {
   console.error(
-    useTheme(`${titleText} :`, styles.backgroundColors.bgYellow),
-    useTheme(msg, styles.backgroundColors.bgRed)
+    useTheme(`${titleText} :`, backgroundColors.bgYellow),
+    useTheme(msg, backgroundColors.bgRed)
   );
 }
 
