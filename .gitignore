@@ -132,3 +132,9 @@ dist
 
 #lock
 pnpm-lock.yaml
+
+# ignore all in 'forders' except .gitkeep file
+target/*
+source/*
+!target/.gitkeep
+!source/.gitkeep
