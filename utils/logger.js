@@ -15,11 +15,10 @@ function useConfigRuleShow(...enableText) {
   return true;
 }
 
-function showMessage(logFunction, titleText, msg, textColor, ...enableRules) {
+function showMessage(logFunction, titleText, msg, titleColor, ...enableRules) {
   if (!useConfigRuleShow(...enableRules)) return;
-  titleColor = useConfigRuleEnableColor(colors.yellow);
-  textColor = useConfigRuleEnableColor(textColor);
-  logFunction(setTheme(`${titleText} :`, titleColor), setTheme(msg, textColor));
+  titleColor = useConfigRuleEnableColor(titleColor);
+  logFunction(setTheme(`${titleText} :`, titleColor), msg);
 }
 
 function info(titleText, msg) {
