@@ -18,7 +18,7 @@ function useConfigRuleShow(...enableText) {
 function showMessage(logFunction, titleText, msg, titleColor, ...enableRules) {
   if (!useConfigRuleShow(...enableRules)) return;
   titleColor = useConfigRuleEnableColor(titleColor);
-  logFunction(setTheme(`${titleText} :`, titleColor), msg);
+  logFunction(setTheme(`${titleText} :`, titleColor), ...msg);
 }
 
 function info(titleText, msg) {
