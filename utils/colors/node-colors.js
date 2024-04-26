@@ -2,11 +2,7 @@ const styles = {
   reset: "\x1b[0m",
   colors: {
     bright: "\x1b[1m",
-    dim: "\x1b[2m",
-    underscore: "\x1b[4m",
     blink: "\x1b[5m",
-    reverse: "\x1b[7m",
-    hidden: "\x1b[8m",
     black: "\x1b[30m",
     red: "\x1b[31m",
     green: "\x1b[32m",
@@ -47,13 +43,27 @@ const styles = {
   },
 };
 
-const useTheme = (text, ...themes) => {
-    if (Array.isArray(text)) {
-        return [themes.join(""), ...text.map(item => (typeof item === 'object') ? JSON.stringify(item) : item), styles.reset].join(" ");
+const setTheme = (text, ...themes) => {
+  if (Array.isArray(text)) {
+    if (!themes) {
+      return [
+        ...text.map((item) =>
+          typeof item === "object" ? JSON.stringify(item) : item
+        ),
+      ];
     }
-    return [themes.join(""), text, styles.reset].join(" ");
+    return [
+      themes.join(""),
+      ...text.map((item) =>
+        typeof item === "object" ? JSON.stringify(item) : item
+      ),
+      styles.reset,
+    ].join(" ");
+  }
+  if (!themes) {
+    return [text];
+  }
+  return [themes.join(""), text, styles.reset].join(" ");
 };
 
-
-
-module.exports = { useTheme, ...styles };
+module.exports = { setTheme, ...styles };
