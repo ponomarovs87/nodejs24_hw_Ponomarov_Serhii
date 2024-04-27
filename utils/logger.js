@@ -1,34 +1,58 @@
-const colors = {
-  reset: "\x1b[0m",
-  red: "\x1b[31m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-};
+const { setTheme, colors, backgroundColors } = require("./colors/node-colors");
+const { useConsoleColors, logLevel } = require("../config/default");
+
+function useConfigRuleEnableColor(textColor) {
+  if (!useConsoleColors) {
+    textColor = null;
+  }
+  return textColor;
+}
+
+function useConfigRuleShow(...enableText) {
+  if (!enableText || !enableText.includes(logLevel)) {
+    return false;
+  }
+  return true;
+}
+
+function showMessage(logFunction, titleText, msg, titleColor, ...enableRules) {
+  if (!useConfigRuleShow(...enableRules)) return;
+  titleColor = useConfigRuleEnableColor(titleColor);
+  logFunction(setTheme(`${titleText} :`, titleColor), ...msg);
+}
 
 function info(titleText, msg) {
-  console.log(colors.yellow, `${titleText}:`, colors.blue, msg, colors.reset);
+  showMessage(console.log, titleText, msg, colors.blue, "info");
 }
 
 function warn(titleText, msg) {
-  console.warn(
-    colors.yellow,
-    `${titleText}:`,
-    colors.magenta,
+  showMessage(
+    console.warn,
+    titleText,
     msg,
-    colors.reset
+    colors.magenta,
+    "info",
+    "warn"
   );
 }
 
 function error(titleText, msg) {
-  console.error(colors.yellow, `${titleText}:`, colors.red, msg, colors.reset);
+  showMessage(
+    console.error,
+    titleText,
+    msg,
+    colors.red,
+    "info",
+    "warn",
+    "error"
+  );
 }
 
 function getLogger(titleText) {
   return {
-    info: (msg) => info(titleText, msg),
-    warn: (msg) => warn(titleText, msg),
-    error: (msg) => error(titleText, msg),
+    info: (...args) => info(titleText, args),
+    warn: (...args) => warn(titleText, args),
+    error: (...args) => error(titleText, args),
   };
 }
 
