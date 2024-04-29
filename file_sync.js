@@ -2,129 +2,200 @@ const fsAsync = require("fs/promises");
 const path = require("path");
 const logger = require("./utils/logger")("file_sync");
 
-async function greatFolderStructure(foldersArray,targetDir) {
-  const logsArray=[]
+async function greatFolderStructure(
+  foldersArray,
+  targetDir
+) {
+  const logsArray = [];
   for (const item of foldersArray) {
-    const folderName = path.basename(item);
-    const newFolderName = path.join(targetDir, folderName);
-    await fsAsync.mkdir(newFolderName, {
-      recursive: true,
-    });
-    logsArray.push(newFolderName)
+    const newFolderName = path.join(targetDir, item);
+    // await fsAsync.mkdir(newFolderName);
+    logsArray.push(newFolderName);
   }
-  return logsArray
+  return logsArray;
 }
-async function copyFile(filesArray,targetDir){
-  const logsArray=[]
+
+async function copyFile(filesArray, targetDir) {
+  const logsArray = [];
   for (const item of filesArray) {
-    const fileName = path.basename(item);
-    const newFileName = path.join(targetDir, fileName);
-    await fsAsync.copyFile(item,newFileName)
-    logsArray.push(newFileName)
+    const newFileName = path.join(targetDir, item);
+    // await fsAsync.copyFile(item, newFileName);
+    logsArray.push(newFileName);
   }
-  return logsArray
+  return logsArray;
 }
 
-async function foldersSync(donorDir, targetDir) {
-  const fullDonorDir = path.join(__dirname, donorDir);
-  const fullTargetDir = path.join(__dirname, targetDir);
-  const logs = [];
-  try {
-    const targetItems = await fsAsync.readdir(
-      fullTargetDir
-    );
-    const donorItems = await fsAsync.readdir(fullDonorDir);
-    let syncArray = [];
-    for (let i = 0; i < donorItems.length; i++) {
-      if (
-        !targetItems.some((item) => item === donorItems[i])
-      ) {
-        const itemPath = path.join(
-          fullDonorDir,
-          donorItems[i]
-        );
-        syncArray.push(itemPath);
-      }
-    }
-    //все папки донора
-    const allFoldersDonor = (
-      await checkItems(donorItems, {
-        dir: donorDir,
-      })
-    ).syncFoldersArray;
+async function readDirectoryStructure(directoryPath) {
+  const result = {
+    files: [],
+    directories: [],
+  };
 
-    // если папки одинаковые и нет подпапок донора
-    if (
-      allFoldersDonor.length === 0 &&
-      syncArray.length === 0
-    ) {
-      return `Папки одинаковые ${fullDonorDir} === ${fullTargetDir}, синхронизации не нужна`;
-    }
-    //разделение по типам что это
-    const syncObjects = await checkItems(syncArray);
-    // создание папок
-    if (syncObjects.syncFoldersArray.length > 0) {
-      await greatFolderStructure(syncObjects.syncFoldersArray,targetDir)
-    }
-    //копирование файлов
-    if (syncObjects.syncFilesArray.length>0) {
-      await copyFile(syncObjects.syncFilesArray,targetDir)
-    }
-    //если есть подпапка у донора
-    if (allFoldersDonor.length > 0) {
-      for (const item of allFoldersDonor) {
-        const folderName = path.basename(item);
-        const targetFolder = path.join(targetDir,folderName)
-        logs.push(await foldersSync(item, targetFolder));
-      }
-    }
-    //logs
-    logs.push(`Необходима синхронизация : \n`, syncObjects);
-  } catch (err) {
-    logger.error(
-      `Ошибка синхронизации папок ${fullDonorDir} => ${fullTargetDir} : \nНепредвиденная ошибка\n`,
-      err
-    );
-  }
-  if (logs.length > 0) {
-    logger.info(...logs);
-  }
-}
+  const items = await fsAsync.readdir(directoryPath);
 
-async function checkItems(syncArray, parameters) {
-  const syncFilesArray = [];
-  const syncFoldersArray = [];
-  const syncOtherArray = [];
-  for (let item of syncArray) {
-    if (parameters && parameters.dir) {
-      item = path.join(parameters.dir, item);
-    }
-    try {
-      const stats = await fsAsync.lstat(item);
-      if (stats.isFile()) {
-        syncFilesArray.push(item);
-      } else if (stats.isDirectory()) {
-        syncFoldersArray.push(item);
-      } else {
-        syncOtherArray.push(item);
-      }
-    } catch (err) {
-      console.error(
-        `что-то пошло не по плану ${item}: ${err}`
+  for (const item of items) {
+    const itemPath = path.join(directoryPath, item);
+    const stats = await fsAsync.stat(itemPath);
+
+    if (stats.isFile()) {
+      result.files.push(item);
+    } else if (stats.isDirectory()) {
+      result.directories.push(item);
+      const subDirectoryStructure =
+        await readDirectoryStructure(itemPath);
+      subDirectoryStructure.files.forEach((file) => {
+        result.files.push(path.join(item, file));
+      });
+      subDirectoryStructure.directories.forEach(
+        (subDirectory) => {
+          result.directories.push(
+            path.join(item, subDirectory)
+          );
+        }
       );
     }
   }
-  return {
-    syncFilesArray,
-    syncFoldersArray,
-    syncOtherArray,
-  };
+
+  return result;
 }
 
-foldersSync("source", "target");
+async function compareItemsAsync(
+  donorItems,
+  targetItems,
+  missingStructure,
+  matches
+) {
+  for (const item of donorItems) {
+    if (!targetItems.includes(item)) {
+      missingStructure.push(item);
+    } else {
+      matches.push(item);
+    }
+  }
+}
+
+async function compareFolders(donor, target) {
+  const missingStructure = {
+    files: [],
+    directories: [],
+  };
+
+  const matches = {
+    files: [],
+    directories: [],
+  };
+
+  await compareItemsAsync(
+    donor.files,
+    target.files,
+    missingStructure.files,
+    matches.files
+  );
+
+  await compareItemsAsync(
+    donor.directories,
+    target.directories,
+    missingStructure.directories,
+    matches.directories
+  );
+
+  return { missingStructure, matches };
+}
+
+async function foldersSync(donorDir, targetDir) {
+  const info = "info";
+  const warn = "warn";
+  const logs = { info: [], warn: [] };
+
+  function addLog(directory, data) {
+    if (Array.isArray(data)) {
+      for (const i of data) {
+        logs[directory].push("\n");
+        logs[directory].push(i);
+        logs[directory].push("\n");
+      }
+    } else {
+      logs[directory].push("\n");
+      logs[directory].push(i);
+      logs[directory].push("\n");
+    }
+  }
+  try {
+    //проверяем донора
+    const donorStructure = await readDirectoryStructure(
+      donorDir
+    );
+    //проверяем целевую папку
+    const targetStructure = await readDirectoryStructure(
+      targetDir
+    );
+    //* logs
+
+    addLog(info, [
+      "donorStructure :",
+      donorStructure,
+      "targetStructure :",
+      targetStructure,
+    ]);
+    // сравниваем данные
+    const compare = await compareFolders(
+      donorStructure,
+      targetStructure
+    );
+    //*logs
+    addLog(info, [
+      "Разница файлов :",
+      "Отсутствует :",
+      compare.missingStructure,
+      "Совпадения :",
+      compare.matches,
+    ]);
+    //* Действия:
+    // Создание отсутствующего дерева (папки и подпапки):
+    const logCreatedStructure = await greatFolderStructure(
+      compare.missingStructure.directories,
+      targetDir
+    );
+    //* log
+    addLog(info, ["Созданы папки :", logCreatedStructure]);
+    // Копирование отсутствующих файлов (в папках и подпапках):
+    const logCreatedFiles = await greatFolderStructure(
+      compare.missingStructure.files,
+      targetDir
+    );
+    //* log
+    addLog(info, ["Созданы файлы :", logCreatedFiles]);
+    //! Логи нужные в ТЗ о том что такой фаил уже существует:
+    addLog(warn, [
+      "Такие файлы уже существуют и не будут заменены :",
+      compare.matches.files,
+    ]);
+    //todo доделать сравнение файлов с предложением замены
+  } catch (err) {
+    logger.error(`что-то пошло не по плану :`, err);
+  }
+  return { info: logs.info, warn: logs.warn };
+}
 
 const fileSync = {
-  async start() {},
+  async start() {
+    try {
+      foldersSync("source", "target")
+        .then(({ info, warn }) => {
+          // logger.info(...info);
+          logger.warn(...warn);
+          console.log("ready");
+        })
+        .catch((error) => {
+          console.error(
+            "что-то пошло не по плану :",
+            error
+          );
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  },
 };
 
 module.exports = fileSync;
