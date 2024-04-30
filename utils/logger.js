@@ -5,7 +5,7 @@ const {
 const {
   useConsoleColors,
   logLevel,
-} = require("../config/default");
+} = require("#config");
 
 function useConfigRuleEnableColor(textColor) {
   if (!useConsoleColors) {

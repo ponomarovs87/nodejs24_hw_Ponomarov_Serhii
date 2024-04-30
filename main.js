@@ -1,5 +1,6 @@
 require("dotenv").config();
-const logger = require("./utils/logger")("main");
+require('module-alias/register')
+const logger = require("#logger")("main");
 const fileSync = require("./file_sync");
 
 logger.info("the script is running!");
