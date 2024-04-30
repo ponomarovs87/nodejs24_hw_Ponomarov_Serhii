@@ -9,7 +9,7 @@ async function greatFolderStructure(
   const logsArray = [];
   for (const item of foldersArray) {
     const newFolderName = path.join(targetDir, item);
-    // await fsAsync.mkdir(newFolderName);
+    await fsAsync.mkdir(newFolderName);
     logsArray.push(newFolderName);
   }
   return logsArray;
@@ -19,7 +19,7 @@ async function copyFile(filesArray, targetDir) {
   const logsArray = [];
   for (const item of filesArray) {
     const newFileName = path.join(targetDir, item);
-    // await fsAsync.copyFile(item, newFileName);
+    await fsAsync.copyFile(item, newFileName);
     logsArray.push(newFileName);
   }
   return logsArray;
@@ -103,23 +103,20 @@ async function compareFolders(donor, target) {
 }
 
 async function foldersSync(donorDir, targetDir) {
-  const info = "info";
-  const warn = "warn";
-  const logs = { info: [], warn: [] };
+  const logs = {};
 
-  function addLog(directory, data) {
-    if (Array.isArray(data)) {
-      for (const i of data) {
-        logs[directory].push("\n");
-        logs[directory].push(i);
-        logs[directory].push("\n");
+  function addLog(directories, subDirectory, data) {
+    for (const directory of directories) {
+      if (!logs[directory]) {
+        logs[directory] = {};
       }
-    } else {
-      logs[directory].push("\n");
-      logs[directory].push(i);
-      logs[directory].push("\n");
+      if (!logs[directory][subDirectory]) {
+        logs[directory][subDirectory] = {};
+      }
+      logs[directory][subDirectory] = data;
     }
   }
+
   try {
     //проверяем донора
     const donorStructure = await readDirectoryStructure(
@@ -130,26 +127,19 @@ async function foldersSync(donorDir, targetDir) {
       targetDir
     );
     //* logs
-
-    addLog(info, [
-      "donorStructure :",
-      donorStructure,
-      "targetStructure :",
-      targetStructure,
-    ]);
+    addLog(["fullInfo"], "donorStructure", donorStructure);
+    addLog(
+      ["fullInfo"],
+      "targetStructure",
+      targetStructure
+    );
     // сравниваем данные
     const compare = await compareFolders(
       donorStructure,
       targetStructure
     );
     //*logs
-    addLog(info, [
-      "Разница файлов :",
-      "Отсутствует :",
-      compare.missingStructure,
-      "Совпадения :",
-      compare.matches,
-    ]);
+    addLog(["info", "fullInfo"], "compare", compare);
     //* Действия:
     // Создание отсутствующего дерева (папки и подпапки):
     const logCreatedStructure = await greatFolderStructure(
@@ -157,44 +147,55 @@ async function foldersSync(donorDir, targetDir) {
       targetDir
     );
     //* log
-    addLog(info, ["Созданы папки :", logCreatedStructure]);
+    addLog(
+      ["info", "fullInfo"],
+      "logCreatedStructure",
+      logCreatedStructure
+    );
     // Копирование отсутствующих файлов (в папках и подпапках):
-    const logCreatedFiles = await greatFolderStructure(
+    const logCreatedFiles = await copyFile(
       compare.missingStructure.files,
       targetDir
     );
     //* log
-    addLog(info, ["Созданы файлы :", logCreatedFiles]);
+    addLog(
+      ["info", "fullInfo"],
+      "logCreatedFiles",
+      logCreatedFiles
+    );
     //! Логи нужные в ТЗ о том что такой фаил уже существует:
-    addLog(warn, [
-      "Такие файлы уже существуют и не будут заменены :",
-      compare.matches.files,
-    ]);
+    addLog(["warn"], "matchesFiles", compare.matches.files);
     //todo доделать сравнение файлов с предложением замены
   } catch (err) {
-    logger.error(`что-то пошло не по плану :`, err);
+    addLog(["Error"], "err", err);
   }
-  return { info: logs.info, warn: logs.warn };
+  return logs;
 }
 
 const fileSync = {
   async start() {
-    try {
-      foldersSync("source", "target")
-        .then(({ info, warn }) => {
-          // logger.info(...info);
-          logger.warn(...warn);
-          console.log("ready");
-        })
-        .catch((error) => {
-          console.error(
-            "что-то пошло не по плану :",
-            error
+    foldersSync("source", "target")
+      .then(({ err, warn, info }) => {
+        if (info.compare.missingStructure) {
+          logger.info(
+            "Отсутствуют :\n",
+            info.compare.missingStructure
           );
-        });
-    } catch (error) {
-      console.error(error);
-    }
+        }
+        if (warn.matchesFiles) {
+          logger.warn(
+            "Совпадения, данные файлы не будут заменены :\n",
+            warn.matchesFiles
+          );
+        }
+        if (err) {
+          logger.error("Ошибки :\n", err);
+        }
+        console.log("ready");
+      })
+      .catch((error) => {
+        logger.error("что-то пошло не по плану :", error);
+      });
   },
 };
 
