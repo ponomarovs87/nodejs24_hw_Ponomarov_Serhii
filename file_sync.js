@@ -15,11 +15,12 @@ async function greatFolderStructure(
   return logsArray;
 }
 
-async function copyFile(filesArray, targetDir) {
+async function copyFile(filesArray, donorDir, targetDir) {
   const logsArray = [];
   for (const item of filesArray) {
+    const donorFile = path.join(donorDir, item);
     const newFileName = path.join(targetDir, item);
-    await fsAsync.copyFile(item, newFileName);
+    await fsAsync.copyFile(donorFile, newFileName);
     logsArray.push(newFileName);
   }
   return logsArray;
@@ -155,6 +156,7 @@ async function foldersSync(donorDir, targetDir) {
     // Копирование отсутствующих файлов (в папках и подпапках):
     const logCreatedFiles = await copyFile(
       compare.missingStructure.files,
+      donorDir,
       targetDir
     );
     //* log
@@ -176,11 +178,20 @@ const fileSync = {
   async start() {
     foldersSync("source", "target")
       .then(({ err, warn, info }) => {
-        if (info.compare.missingStructure) {
+        if (info.compare.missingStructure.files[0]) {
           logger.info(
-            "Отсутствуют :\n",
-            info.compare.missingStructure
+            "Отсутствовали файлы :\n",
+            info.compare.missingStructure.files
           );
+        }
+        if (info.compare.missingStructure.directories[0]) {
+          logger.info(
+            "Отсутствовали директории :\n",
+            info.compare.missingStructure.directories
+          );
+        }
+        if (!info.compare.missingStructure.files[0] && !info.compare.missingStructure.directories[0]) {
+          logger.info("Нечего копировать")
         }
         if (warn.matchesFiles) {
           logger.warn(
@@ -188,10 +199,10 @@ const fileSync = {
             warn.matchesFiles
           );
         }
+        
         if (err) {
           logger.error("Ошибки :\n", err);
         }
-        console.log("ready");
       })
       .catch((error) => {
         logger.error("что-то пошло не по плану :", error);
