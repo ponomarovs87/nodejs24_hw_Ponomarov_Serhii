@@ -1,14 +1,12 @@
 require("dotenv").config();
-const logger = require("./utils/logger")("main");
+require('module-alias/register')
+const logger = require("#logger")("main");
+const fileSync = require("./file_sync");
 
 logger.info("the script is running!");
 logger.warn("the script is running!");
 logger.error("the script is running!");
-logger.info("the script is running!", 2, 345, 2);
-logger.error("the script is running!", 2, 345, 2, {}, [1, 2], {
-  name: "Serhii",
-  innerOBJ: {
-    name: "vasya",
-    innerobj: { name: "vasya2", innerarray: [1, "82", { name: "123" }] },
-  },
-});
+
+fileSync.start();
+
+logger.info("я не блокирую ИвентЛуп если я сначала или блочу если я после");

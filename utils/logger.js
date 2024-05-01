@@ -1,5 +1,11 @@
-const { setTheme, colors, backgroundColors } = require("./colors/node-colors");
-const { useConsoleColors, logLevel } = require("../config/default");
+const {
+  setTheme,
+  colors,
+} = require("./colors/node-colors");
+const {
+  useConsoleColors,
+  logLevel,
+} = require("#config");
 
 function useConfigRuleEnableColor(textColor) {
   if (!useConsoleColors) {
@@ -15,14 +21,25 @@ function useConfigRuleShow(...enableText) {
   return true;
 }
 
-function showMessage(logFunction, titleText, msg, titleColor, ...enableRules) {
+function showMessage(
+  logFunction,
+  titleText,
+  msg,
+  titleColor,
+  enableRules
+) {
   if (!useConfigRuleShow(...enableRules)) return;
   titleColor = useConfigRuleEnableColor(titleColor);
-  logFunction(setTheme(`${titleText} :`, titleColor), ...msg);
+  logFunction(
+    setTheme(`${titleText} :`, titleColor),
+    ...msg
+  );
 }
 
 function info(titleText, msg) {
-  showMessage(console.log, titleText, msg, colors.blue, "info");
+  showMessage(console.log, titleText, msg, colors.blue, [
+    "info",
+  ]);
 }
 
 function warn(titleText, msg) {
@@ -31,21 +48,16 @@ function warn(titleText, msg) {
     titleText,
     msg,
     colors.magenta,
-    "info",
-    "warn"
+    ["info", "warn"]
   );
 }
 
 function error(titleText, msg) {
-  showMessage(
-    console.error,
-    titleText,
-    msg,
-    colors.red,
+  showMessage(console.error, titleText, msg, colors.red, [
     "info",
     "warn",
-    "error"
-  );
+    "error",
+  ]);
 }
 
 function getLogger(titleText) {
