@@ -10,3 +10,8 @@ logger.error("the script is running!");
 fileSync.start();
 
 logger.info("я не блокирую ИвентЛуп если я сначала или блочу если я после");
+
+setTimeout(()=>{console.log("1");},1);
+
+
+setTimeout(()=>{console.log("1000");},1000);
