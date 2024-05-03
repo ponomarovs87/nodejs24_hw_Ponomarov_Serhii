@@ -35,3 +35,6 @@
 2. Переделать относительные ссылки
 ---
 ## Материалы :
+[флаги](https://nodejs.org/api/fs.html#file-system-flags)
+[конфиг ноды](https://github.com/node-config/node-config/wiki/Configuration-Files)
+[fs.createWriteStream](https://nodejs.org/api/fs.html#fscreatewritestreampath-options)

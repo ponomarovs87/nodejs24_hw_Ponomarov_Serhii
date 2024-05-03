@@ -17,6 +17,8 @@ if (!fs.existsSync(logFolderPath)) {
 
 let streamFlag = onlyLastLogs ? "w" : "a";
 
+// console.log("инициализация Логгера");
+
 const infoStream = fs.createWriteStream(
   path.join(logFolderPath, "info.log"),
   { flags: streamFlag, encoding: "utf8" }

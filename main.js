@@ -16,13 +16,13 @@ logger.error("the script is running!");
 fileSync.start();
 
 logger.info(
-  "я не блокирую ИвентЛуп если я сначала или блочу если я после"
+  "Конец асинхронного кода"
 );
 
 setTimeout(() => {
-  console.log("1");
+  logger.info("асинхронного код через 1 миллисекунду");
 }, 1);
 
 setTimeout(() => {
-  console.log("1000");
+  logger.info("асинхронного код через 1 секунду");
 }, 1000);
