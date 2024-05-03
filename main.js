@@ -1,10 +1,13 @@
 require("dotenv").config();
-require("module-alias/register");
-const logger = require("#logger")("main");
-const {
-  fileSync,
-  createFolderIfNotExists,
-} = require("./file_sync");
+const path = require("path");
+process.env["MY_CONFIG"] = path.join(
+  __dirname,
+  "config",
+  "default.js"
+);
+require(process.env.MY_CONFIG);
+const logger = require(process.env.MY_LOGGER)("main");
+const { fileSync } = require("./file_sync");
 
 logger.info("the script is running!");
 logger.warn("the script is running!");
@@ -23,5 +26,3 @@ setTimeout(() => {
 setTimeout(() => {
   console.log("1000");
 }, 1000);
-
-

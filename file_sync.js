@@ -1,6 +1,6 @@
 const fsAsync = require("fs/promises");
 const path = require("path");
-const logger = require("#logger")("file_sync");
+const logger = require(process.env.MY_LOGGER)("file_sync");
 
 async function createFolderIfNotExists(
   folder,
@@ -10,7 +10,7 @@ async function createFolderIfNotExists(
   if (targetDir !== __dirname) {
     folderPath = path.join(__dirname, folderPath);
   }
-
+  
   try {
     await fsAsync.access(
       folderPath,
