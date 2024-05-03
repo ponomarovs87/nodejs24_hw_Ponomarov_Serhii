@@ -2,26 +2,6 @@ const fsAsync = require("fs/promises");
 const path = require("path");
 const logger = require(process.env.MY_LOGGER)("file_sync");
 
-async function createFolderIfNotExists(
-  folder,
-  targetDir = __dirname
-) {
-  let folderPath = path.join(targetDir, folder);
-  if (targetDir !== __dirname) {
-    folderPath = path.join(__dirname, folderPath);
-  }
-  
-  try {
-    await fsAsync.access(
-      folderPath,
-      fsAsync.constants.F_OK
-    );
-  } catch (error) {
-    // Если папка не существует, создаем ее
-    await fsAsync.mkdir(folderPath);
-  }
-}
-
 async function greatFolderStructure(
   foldersArray,
   targetDir
@@ -233,4 +213,4 @@ const fileSync = {
   },
 };
 
-module.exports = { fileSync, createFolderIfNotExists };
+module.exports = { fileSync };
