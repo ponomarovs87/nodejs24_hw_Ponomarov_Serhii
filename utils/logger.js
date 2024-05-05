@@ -7,15 +7,15 @@ const {
 const {
   useConsoleColors,
   logLevel,
-  onlyLastLogs,
-} = require(process.env.MY_CONFIG);
+  useOnlyLastLogs,
+} = require("config");
 
 const logFolderPath = path.join(__dirname, "../logs");
 if (!fs.existsSync(logFolderPath)) {
   fs.mkdirSync(logFolderPath);
 }
 
-let streamFlag = onlyLastLogs ? "w" : "a";
+let streamFlag = useOnlyLastLogs ? "w" : "a";
 
 // console.log("инициализация Логгера");
 
@@ -31,7 +31,6 @@ const errorStream = fs.createWriteStream(
 );
 
 process.once("beforeExit", () => {
-  // getLogger("logger").info(`Логи сохранены`);
   infoStream.end();
   errorStream.end();
 });
@@ -66,13 +65,9 @@ function showMessage(
 }
 
 function streamWrite(runnerInfo, titleText, msg, stream) {
-  const message = `[${new Date()
-    .toISOString()
-    .slice(0, 19)
-    .replace(
-      "T",
-      " "
-    )}]\n'${runnerInfo}': ${titleText}: ${msg.join("\n")}`;
+  const message = `[${new Date().toISOString()}]\n'${runnerInfo}': ${titleText}: ${msg.join(
+    "\n"
+  )}`;
   stream.write(`${message}\n`);
 }
 
