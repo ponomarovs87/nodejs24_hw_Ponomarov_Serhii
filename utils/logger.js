@@ -8,7 +8,7 @@ const {
   useConsoleColors,
   logLevel,
   onlyLastLogs,
-} = require(process.env.MY_CONFIG);
+} = require('config');
 
 const logFolderPath = path.join(__dirname, "../logs");
 if (!fs.existsSync(logFolderPath)) {
