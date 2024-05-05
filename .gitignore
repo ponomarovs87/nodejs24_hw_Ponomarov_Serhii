@@ -132,6 +132,7 @@ dist
 
 #lock
 pnpm-lock.yaml
+package-lock.json
 
 # ignore all in 'forders' except .gitkeep file
 target/*
