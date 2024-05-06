@@ -1,6 +1,6 @@
 const fsAsync = require("fs/promises");
 const path = require("path");
-const logger = require("#logger")("file_sync");
+const logger = require("./utils/logger")("file_sync");
 
 async function greatFolderStructure(
   foldersArray,
@@ -190,8 +190,11 @@ const fileSync = {
             info.compare.missingStructure.directories
           );
         }
-        if (!info.compare.missingStructure.files[0] && !info.compare.missingStructure.directories[0]) {
-          logger.info("Нечего копировать")
+        if (
+          !info.compare.missingStructure.files[0] &&
+          !info.compare.missingStructure.directories[0]
+        ) {
+          logger.info("Нечего копировать");
         }
         if (warn.matchesFiles) {
           logger.warn(
@@ -199,7 +202,7 @@ const fileSync = {
             warn.matchesFiles
           );
         }
-        
+
         if (err) {
           logger.error("Ошибки :\n", err);
         }
@@ -210,4 +213,4 @@ const fileSync = {
   },
 };
 
-module.exports = fileSync;
+module.exports = { fileSync };

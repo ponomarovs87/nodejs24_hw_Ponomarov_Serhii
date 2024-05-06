@@ -17,19 +17,11 @@
     "url": "https://github.com/ponomarovs87/nodejs24_hw_Ponomarov_Serhii/issues"
   },
   "homepage": "https://github.com/ponomarovs87/nodejs24_hw_Ponomarov_Serhii/blob/homework_1/tasks/hw1.md",
-  "imports": {
-    "#*": "./utils/*"
-  },
-  "_moduleAliases": {
-    "#": ".",
-    "#config":"./config/default",
-    "#logger": "./utils/logger"
-  },
   "devDependencies": {
     "nodemon": "^3.1.0"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "module-alias": "^2.2.3"
+    "config": "^3.3.11",
+    "dotenv": "^16.4.5"
   }
 }

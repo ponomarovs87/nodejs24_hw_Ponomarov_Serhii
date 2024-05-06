@@ -1,7 +1,7 @@
 require("dotenv").config();
-require('module-alias/register')
-const logger = require("#logger")("main");
-const fileSync = require("./file_sync");
+const logger = require("./utils/logger")("main");
+
+const { fileSync } = require("./file_sync");
 
 logger.info("the script is running!");
 logger.warn("the script is running!");
@@ -9,4 +9,12 @@ logger.error("the script is running!");
 
 fileSync.start();
 
-logger.info("я не блокирую ИвентЛуп если я сначала или блочу если я после");
+logger.info("Конец асинхронного кода");
+
+setTimeout(() => {
+  logger.info("асинхронного код через 1 миллисекунду");
+}, 1);
+
+setTimeout(() => {
+  logger.info("асинхронного код через 1 секунду");
+}, 1000);

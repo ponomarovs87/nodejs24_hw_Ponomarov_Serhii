@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const {
   setTheme,
   colors,
@@ -5,7 +7,33 @@ const {
 const {
   useConsoleColors,
   logLevel,
-} = require("#config");
+  useOnlyLastLogs,
+} = require("config");
+
+const logFolderPath = path.join(__dirname, "../logs");
+if (!fs.existsSync(logFolderPath)) {
+  fs.mkdirSync(logFolderPath);
+}
+
+let streamFlag = useOnlyLastLogs ? "w" : "a";
+
+// console.log("инициализация Логгера");
+
+const infoStream = fs.createWriteStream(
+  path.join(logFolderPath, "info.log"),
+  { flags: streamFlag, encoding: "utf8" }
+);
+
+//encoding:'utf8' параметр по умолчанию по этому не передан во второе
+const errorStream = fs.createWriteStream(
+  path.join(logFolderPath, "errors.log"),
+  { flags: streamFlag }
+);
+
+process.once("beforeExit", () => {
+  infoStream.end();
+  errorStream.end();
+});
 
 function useConfigRuleEnableColor(textColor) {
   if (!useConsoleColors) {
@@ -36,13 +64,22 @@ function showMessage(
   );
 }
 
+function streamWrite(runnerInfo, titleText, msg, stream) {
+  const message = `[${new Date().toISOString()}]\n'${runnerInfo}': ${titleText}: ${msg.join(
+    "\n"
+  )}`;
+  stream.write(`${message}\n`);
+}
+
 function info(titleText, msg) {
+  streamWrite("info", titleText, msg, infoStream);
   showMessage(console.log, titleText, msg, colors.blue, [
     "info",
   ]);
 }
 
 function warn(titleText, msg) {
+  streamWrite("warn", titleText, msg, errorStream);
   showMessage(
     console.warn,
     titleText,
@@ -53,6 +90,7 @@ function warn(titleText, msg) {
 }
 
 function error(titleText, msg) {
+  streamWrite("error", titleText, msg, errorStream);
   showMessage(console.error, titleText, msg, colors.red, [
     "info",
     "warn",
