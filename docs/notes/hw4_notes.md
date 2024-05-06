@@ -43,33 +43,73 @@
 
 ## Lock в .gitignore
 
-Нет, package-lock.json НЕ СЛЕДУЕТ добавлять в .gitignore. Вместо этого я настоятельно советую:
+No, the package-lock.json SHOULD NOT be added to .gitignore. Instead, I strongly advise:
 
-Добавьте package-lock.jsonвас в свой репозиторий контроля версий.
-Используйте npm ciвместоnpm install при создании приложения как локально, так и в конвейере развертывания.
-( ciКоманда доступна начиная с npm@5.7 , если есть сомнения, обновите npm через:
+Add the package-lock.json you to your version control repository
+Use npm ci instead of npm install when building your application both locally and in your deployment pipeline.
+(The ci command is available since npm@5.7, if in doubt upgrade your npm via:
 npm install -g npm.)
-Одним из самых больших недостатков команды npm installявляется ее неожиданное поведение: она может изменить package-lock.json, тогда как npm ciиспользуется только версия из файла блокировки и выдается ошибка, если package-lock.jsonи package.jsonне синхронизированы.
+One of the biggest downside of the npm install command is its unexpected behavior that it may mutate the package-lock.json, whereas npm ci only uses the version in the lockfile and produces an error if the package-lock.json and package.json are out of sync.
 
-Кроме того, npm ci требуется наличие package-lock.jsonи выведет ошибку, если ее не будет. Существует веский вариант использования уверенности в том, что зависимости проекта разрешаются повторяемым и надежным образом на разных машинах.
+Also, npm ci requires the existence of a package-lock.json and would print an error if it wasn't there. There is a strong use-case for being able to trust that the project's dependencies resolve repeatably in a reliable way across different machines.
 
-Более того, перед добавлением зависимостей npm ciуничтожается вся папка, гарантируя, что вы работаете с реальными зависимостями, а не с локальными изменениями, и при этом работаете быстрее, чем обычный файл .node_modulesnpm install
+Furthermore, npm ci nukes the entire node_modules folder before adding the dependencies making sure you work with your actual dependencies instead of local changes while still being faster than a normal npm install.
 
-Из a package-lock.jsonвы получаете именно это: заведомо работоспособное состояние с всегда одним и тем же деревом зависимостей.
+From a package-lock.json you get exactly that: a known-to-work state with always exactly the same dependency tree.
 
-В прошлом у меня были проекты без файлов package-lock.json// npm-shrinkwrap.json, yarn.lockсборка которых однажды завершалась неудачно из-за того, что случайная зависимость получила критическое обновление. (Хотя многие библиотеки соблюдают правила управления версиями semvar, вы не можете гарантировать, что они не сломаются при незначительном обновлении.)
+In the past, I had projects without package-lock.json / npm-shrinkwrap.json / yarn.lock files whose build would fail one day because a random dependency got a breaking update. (While a lot of libraries respect the semvar versioning guideline, you have no guarantee they won't break on a minor upgrade.)
 
-Эту проблему трудно решить, поскольку иногда приходится угадывать, какая была последняя работающая версия.
+Those issue are hard to resolve as you sometimes have to guess what the last working version was.
 
-Что касается тестирования последних зависимостей для вашего проекта: это то, npm updateдля чего он нужен, и я утверждаю, что его должен запускать разработчик, который также запускает тест локально, который решает проблемы, если они могут возникнуть, и который затем фиксирует измененные файлы package-lock.json. (Если обновление не удалось, они могут вернуться к последней работающей версии package-lock.json.)
+In regards to testing the latest dependencies for your project: This is what npm update is for and I argue that it should be run by a developer, who also runs the test locally, who resolves issue if they may arise, and who then commits the changed package-lock.json. (If an upgrade fails, they can revert to the last working package-lock.json.)
 
-Более того, я редко обновляю все зависимости одновременно (поскольку это тоже может потребовать дальнейшего обслуживания), а скорее выбираю то обновление, которое мне нужно (например npm update {dependency}, или npm install {dependency}@2.1.3). Это еще одна причина, по которой я рассматриваю это как этап ручного обслуживания.
+Furthermore, I rarely upgrade all the dependencies at once (as that too might require further maintenance) but I rather cherry-pick the update I need (e.g. npm update {dependency}, or npm install {dependency}@2.1.3). Which is another reason why I would see it as a manual maintenance step.
 
-Если вы действительно хотите, чтобы это было автоматизировано, вы можете создать работу для:
+If you really want to have it automated you could create a job for:
 
-репозиторий оформления заказа
-запустить обновление npm
-запускать тесты
-если тесты пройдены, зафиксируйте и отправьте в репозиторий
-в противном случае произойдет сбой и сообщите о проблеме, которую нужно решить вручную.
-Я бы хотел, чтобы это было размещено на сервере CI, например Jenkins, и этого не следует достигать по вышеупомянутой причине путем добавления файла в файл .gitignore.
+checkout repository
+run npm update
+run tests
+if tests passes, then commit and push to repository
+else fail and report issue to be manually resolved
+This is something I would see hosted on a CI server, e.g. Jenkins, and it should not be achieved through aforementioned reason through adding the file to the .gitignore.
+
+Or to quote npm doc:
+
+It is highly recommended you commit the generated package lock to source control: this will allow anyone else on your team, your deployments, your CI/continuous integration, and anyone else who runs npm install in your package source to get the exact same dependency tree that you were developing on. Additionally, the diffs from these changes are human-readable and will inform you of any changes npm has made to your node_modules, so you can notice if any transitive dependencies were updated, hoisted, etc.
+
+And in regards to the difference between npm ci vs npm install:
+
+The project must have an existing package-lock.json or npm-shrinkwrap.json.
+If dependencies in the package lock do not match those in package.json, npm ci will exit with an error, instead of updating the package lock.
+npm ci can only install entire projects at a time: individual dependencies cannot be added with this command.
+If a node_modules is already present, it will be automatically removed before npm ci begins its install.
+It will never write to package.json or any of the package-locks: installs are essentially frozen.
+Share
+Improve this answer
+Follow
+edited May 4, 2022 at 10:39
+answered Jan 30, 2018 at 15:02
+k0pernikus's user avatar
+k0pernikus
+64k7575 gold badges226226 silver badges352352 bronze badges
+8
+@MagicLAMP You rather should use npm ci instead of npm install on your build server. Then your problem would go away. – 
+k0pernikus
+ Aug 26, 2019 at 8:11 
+6
+Fwiw the .gitignore on the webpack Github does include package-lock.json... – 
+jsstuball
+ Jan 28, 2020 at 19:16 
+7
+@JSStuball webpack uses yarn instead of npm. It has a yarn.lock (equivalent to package-lock.json) in its repository. See also: github.com/webpack/webpack/pull/6930#issuecomment-377987981 – 
+k0pernikus
+ Jan 28, 2020 at 19:49
+3
+@k0pernikus finally got npm ci working on my ansible deploy, and committed package-lock to the repository. This allows my front end developer to deploy things. Thanks. – 
+MagicLAMP
+ May 4, 2020 at 3:07
+5
+@Jundl Could you please open a new question in the form of "Why does npm ci not use cache for chromium dependency?" and reference minimal, complete and verifyable example of a package.json of yours? I would have a look then. You could link your question here. – 
+k0pernikus
+ Feb 2, 2021 at 11:14
