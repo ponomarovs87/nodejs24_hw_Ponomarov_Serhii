@@ -4,6 +4,7 @@
   "description": "homework 1 lesson 1",
   "main": "main.js",
   "scripts": {
+    "start:debug": "node --inspect-brk main.js",
     "start": "node main.js",
     "dev": "nodemon main.js"
   },

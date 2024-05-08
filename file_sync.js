@@ -32,7 +32,7 @@ async function readDirectoryStructure(directoryPath) {
     directories: [],
   };
 
-  const items = await fsAsync.readdir(directoryPath);
+  const items = await fsAsync.readdir(directoryPath,{recursive:true});
 
   for (const item of items) {
     const itemPath = path.join(directoryPath, item);
@@ -42,18 +42,18 @@ async function readDirectoryStructure(directoryPath) {
       result.files.push(item);
     } else if (stats.isDirectory()) {
       result.directories.push(item);
-      const subDirectoryStructure =
-        await readDirectoryStructure(itemPath);
-      subDirectoryStructure.files.forEach((file) => {
-        result.files.push(path.join(item, file));
-      });
-      subDirectoryStructure.directories.forEach(
-        (subDirectory) => {
-          result.directories.push(
-            path.join(item, subDirectory)
-          );
-        }
-      );
+      // const subDirectoryStructure =
+      //   await readDirectoryStructure(itemPath);
+      // subDirectoryStructure.files.forEach((file) => {
+      //   result.files.push(path.join(item, file));
+      // });
+      // subDirectoryStructure.directories.forEach(
+      //   (subDirectory) => {
+      //     result.directories.push(
+      //       path.join(item, subDirectory)
+      //     );
+      //   }
+      // );
     }
   }
 

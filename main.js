@@ -12,9 +12,9 @@ fileSync.start();
 logger.info("Конец асинхронного кода");
 
 setTimeout(() => {
-  logger.info("асинхронного код через 1 миллисекунду");
+  logger.info("async code через 1 миллисекунду");
 }, 1);
 
 setTimeout(() => {
-  logger.info("асинхронного код через 1 секунду");
+  logger.info("async code через 1 секунду");
 }, 1000);

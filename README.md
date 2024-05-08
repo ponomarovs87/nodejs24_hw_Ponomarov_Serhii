@@ -13,3 +13,4 @@ HW_nodeJS_course
 2. [hw2](docs/notes/hw2_notes.md)
 3. [hw3](docs/tasks/hw3_todo.md)
 4. [hw4](docs/tasks/hw4_todo.md)
+4. [hw5](docs/tasks/hw5_todo.md)
