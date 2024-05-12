@@ -25,7 +25,6 @@ srv.on("request", (req, res) => {
     res.end(
       JSON.stringify({
         answer: `healthcheck passed`,
-        info: `Yes my Lord, order 66 will be done`,
       })
     );
     logger.info(
@@ -33,6 +32,19 @@ srv.on("request", (req, res) => {
     );
     return;
   }
+//   if (req.url === "/order66") {
+//     res.statusCode = 200;
+//     res.setHeader("Content-Type", "application/json");
+//     res.end(
+//       JSON.stringify({
+//         answer: `Yes my Lord, order 66 will be done`,
+//       })
+//     );
+//     logger.info(
+//       `[${req.method}] ${req.url} ${res.statusCode}`
+//     );
+//     return;
+//   }
   res.statusCode = 404;
   res.setHeader("Content-Type", "application/json");
   res.end(
