@@ -14,7 +14,7 @@ HW_nodeJS_course
 
 1. [lesson 1](docs/notes/lesson1_notes.md)
 2. [lesson 2](docs/notes/lesson2_notes.md)
-3. [lesson 3](docs/tasks/lesson3_notes.md)
-4. [lesson 4](docs/tasks/lesson4_notes.md)
-5. [lesson 5](docs/tasks/lesson5_notes.md)
-6. [lesson 6](docs/tasks/lesson6_notes.md)
+3. [lesson 3](docs/notes/lesson3_notes.md)
+4. [lesson 4](docs/notes/lesson4_notes.md)
+5. [lesson 5](docs/notes/lesson5_notes.md)
+6. [lesson 6](docs/notes/lesson6_notes.md)
