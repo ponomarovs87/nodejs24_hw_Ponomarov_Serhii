@@ -10,12 +10,12 @@ srv.listen(serverPort);
 
 srv.on("listening", () =>
   logger.info(
-    `start on http://localhost:${serverPort}\n endpoint order 66 : http://localhost:${serverPort}/healthcheck`
+    `start on http://localhost:${serverPort}\n endpoint healthcheck : http://localhost:${serverPort}/healthcheck`
   )
 );
 
 srv.on("request", (req, res) => {
-  if (req.url === "/healthcheck") {
+  if (req.method === "GET" && req.url === "/healthcheck") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.end(
@@ -45,7 +45,7 @@ srv.on("request", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.end(
     JSON.stringify({
-      error: "page not found or bad request",
+      error: "page not found",
     })
   );
   logger.warn(
