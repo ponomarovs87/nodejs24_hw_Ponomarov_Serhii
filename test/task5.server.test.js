@@ -31,7 +31,7 @@ function generateRandomString() {
     return result;
   }
 
-describe("first test collection", () => {
+describe("task5(server) collection", () => {
   it("should return 200 status and healthcheck passed message", (done) => {
     supertest(server)
       .get("/healthcheck")
@@ -45,7 +45,7 @@ describe("first test collection", () => {
         done();
       });
   });
-  it("should return 404 status", (done) => {
+  it("post /healthcheck should return 404 status", (done) => {
     supertest(server)
       .post("/healthcheck")
       .expect(404)
@@ -68,12 +68,4 @@ describe("first test collection", () => {
         });
     });
   }
-
-  it("test two values", () => {
-    //test
-    let expectedValue = 10;
-    let actualValue = 10;
-
-    expect(actualValue).to.be.equal(expectedValue);
-  });
 });

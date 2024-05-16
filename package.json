@@ -9,7 +9,7 @@
     "dev": "nodemon main.js",
     "sever:debug:dev": "nodemon --inspect server.js",
     "sever:dev": "nodemon server.js",
-    "test": "mocha --exit"
+    "tests": "mocha --exit"
   },
   "repository": {
     "type": "git",
