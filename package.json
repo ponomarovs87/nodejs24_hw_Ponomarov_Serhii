@@ -8,9 +8,9 @@
     "start": "node main.js",
     "dev": "nodemon main.js",
     "sever:debug:dev": "nodemon --inspect server.js",
-    "express:debug:dev": "nodemon --inspect server-express.js"
+    "express:debug:dev": "nodemon --inspect server-express.js",
     "sever:dev": "nodemon server.js",
-    "tests": "mocha --exit"
+    "tests": "mocha  --exit"
   },
   "repository": {
     "type": "git",

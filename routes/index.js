@@ -2,13 +2,14 @@ const express = require("express");
 const router = express.Router();
 
 const usersRoutes = require("./usersRoutes");
-const {
-  userCreateValidator,
-} = require("../middleware/validation/user-validation");
+// const {
+  // userCreateValidator,
+// } = require("../middleware/validation/user-validation");
 
-router.post("/user", userCreateValidator, (req, res) => {
-  res.status(201).send({ answer: "User created" });
-});
+//! опционально в таске было написанное с s но s другим шрифтом
+// router.post("/user", userCreateValidator, (req, res) => {
+//   res.status(201).send({ answer: "User created" });
+// });
 
 router.use("/users", usersRoutes);
 

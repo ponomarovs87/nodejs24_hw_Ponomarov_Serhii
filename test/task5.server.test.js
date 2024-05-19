@@ -2,10 +2,9 @@ const chai = require("chai");
 const chaiHttp = require("chai-http");
 const supertest = require("supertest");
 
-const should = chai.should();
 const expect = chai.expect;
 
-const server = require("../server");
+const server = require("../server-express");
 
 chai.use(chaiHttp);
 
@@ -31,7 +30,7 @@ function generateRandomString() {
     return result;
   }
 
-describe("task5(server) collection", () => {
+describe("task5(server) collection /healthcheck endpoint", () => {
   it("should return 200 status and healthcheck passed message", (done) => {
     supertest(server)
       .get("/healthcheck")
