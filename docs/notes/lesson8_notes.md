@@ -4,4 +4,6 @@
 
 [morgan npm](https://www.npmjs.com/package/morgan)
 
+// морган фу*** много ненужных функций 
+
 [rotation file stream](https://www.npmjs.com/package/rotating-file-stream)
