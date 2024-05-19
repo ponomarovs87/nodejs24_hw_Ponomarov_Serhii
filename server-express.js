@@ -21,3 +21,5 @@ app.listen(server.port, () => {
 app.use(morganLogger); //подключение логгера моргана
 
 app.use("/", routes);
+
+module.exports = app;
