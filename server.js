@@ -55,3 +55,5 @@ srv.on("request", (req, res) => {
   );
   return;
 });
+
+module.exports = srv;
