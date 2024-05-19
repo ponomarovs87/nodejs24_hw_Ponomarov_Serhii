@@ -5,9 +5,7 @@ const {
   colors,
 } = require("./colors/node-colors");
 const {
-  useConsoleColors,
-  logLevel,
-  useOnlyLastLogs,
+  logger: { useConsoleColors, logLevel, useOnlyLastLogs },
 } = require("config");
 
 const logFolderPath = path.join(__dirname, "../logs");

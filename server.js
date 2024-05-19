@@ -1,16 +1,18 @@
 require("dotenv").config();
 const http = require("http");
 
-const { serverPort, serverHost } = require("config");
+const {
+  server: { port, host },
+} = require("config");
 const logger = require("./utils/logger")("server");
 
 const srv = http.createServer();
 
-srv.listen(serverPort);
+srv.listen(port);
 
 srv.on("listening", () =>
   logger.info(
-    `start on ${serverHost}:${serverPort}\n endpoint healthcheck : ${serverHost}:${serverPort}/healthcheck`
+    `start on ${host}:${port}\n endpoint healthcheck : ${host}:${port}/healthcheck`
   )
 );
 
