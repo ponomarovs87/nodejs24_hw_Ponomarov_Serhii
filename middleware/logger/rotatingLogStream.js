@@ -6,8 +6,8 @@ function createGenerator(fileName) {
     if (!time) return `${fileName}.log`;
 
     const year = time.getFullYear();
-    const month = `0${time.getMonth() + 1}`.slice(-2);
-    const day = `0${time.getDate()}`.slice(-2);
+    const month = `${time.getMonth() + 1}`.padStart(2, '0');
+    const day = `${time.getDate()}`.padStart(2, '0');
 
     return `${year}-${month}-${day}-${index}-${fileName}.log`;
   };

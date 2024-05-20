@@ -16,12 +16,8 @@ const morganErrorLogger = morgan(logMassageFormat, {
   },
 });
 
-const morganLogger = (req, res, next) => {
-  morganAllLogger(req, res, () => {
-    morganAllLoggerConsole(req, res, () => {
-      morganErrorLogger(req, res, next);
-    });
-  });
-};
-
-module.exports = morganLogger;
+module.exports = {
+  morganAllLogger, 
+  morganAllLoggerConsole, 
+  morganErrorLogger
+}
