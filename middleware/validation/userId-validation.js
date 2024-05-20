@@ -1,30 +1,27 @@
 const yup = require("yup");
 
-const onlyNumbersRegex = /^\d+$/;
-
-const userIdSchema = yup.object({
-    userId: yup
-      .string()
-      .required('Поле обязательно')
-      .matches(onlyNumbersRegex, 'Поле должно содержать только цифры')
-      .test('is-integer', 'Поле должно быть целым числом', (value) => Number.isInteger(Number(value)))
-      .test('is-positive', 'значение должно быть позитивным и более 0', (value) => parseFloat(value) > 0),
-  });
+const userIdSchema = yup.number().label('userId')
+  .typeError('Should be a number')
+  .integer('Should be an integer')
+  .positive('Should be more than 0');
 
 const userIdValidator = async (req, res, next) => {
   try {
-    await userIdSchema.validate(req.params, {
+    await userIdSchema.validate(req.params.userId, {
       abortEarly: false,
     });
     next();
   } catch (err) {
-    let errors = {};
-    err.inner.forEach((error) => {
-      if (!errors[error.path]) {
-        errors[error.path] = [];
+    const errors = err.inner.reduce((acc, error) => {
+      if (!acc[error.params.label]) {
+        acc[error.params.label] = [];
       }
-      errors[error.path].push(error.message);
-    });
+
+      acc[error.params.label].push(error.message);
+
+      return acc;
+    }, {});
+
     res.status(400).send({ errors });
   }
 };
