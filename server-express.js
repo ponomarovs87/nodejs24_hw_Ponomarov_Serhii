@@ -3,6 +3,7 @@ const { server } = require("config");
 
 const express = require("express");
 const {
+  captureResponseBody,
   morganAllLogger,
   morganAllLoggerConsole,
   morganErrorLogger,
@@ -23,6 +24,7 @@ app.listen(server.port, () => {
 });
 
 [
+  captureResponseBody,
   morganAllLogger,
   morganAllLoggerConsole,
   morganErrorLogger,
