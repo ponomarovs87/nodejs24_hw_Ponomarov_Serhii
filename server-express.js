@@ -4,9 +4,11 @@ const { server,client } = require("config");
 const express = require("express");
 const {
   captureResponseBody,
-  morganAllLogger,
+  morganAllLoggerServer,
   morganAllLoggerConsole,
-  morganErrorLogger,
+  morganErrorLoggerServer,
+  morganAllLoggerClient,
+  morganErrorLoggerClient,
 } = require("./middleware/logger/morgan");
 
 const routes = require("./routes/index");
@@ -30,15 +32,22 @@ clientApp.listen(client.port, () => {
 
 [
   captureResponseBody,
-  morganAllLogger,
+  morganAllLoggerServer,
   morganAllLoggerConsole,
-  morganErrorLogger,
+  morganErrorLoggerServer,
 ].forEach((item) => app.use(item));
+
+[
+  captureResponseBody,
+  morganAllLoggerClient,
+  morganAllLoggerConsole,
+  morganErrorLoggerClient,
+].forEach((item) => clientApp.use(item));
 
 app.use("/", routes);
 
 clientApp.get("/",(req,res)=>{
-  res.send({answer:`hi it's port 3001`})
+  res.status(200).send({answer:`hi it's port 3001`})
 })
 
 module.exports = app;

@@ -6,8 +6,8 @@ function createGenerator(fileName) {
     if (!time) return `${fileName}.log`;
 
     const year = time.getFullYear();
-    const month = `${time.getMonth() + 1}`.padStart(2, '0');
-    const day = `${time.getDate()}`.padStart(2, '0');
+    const month = `${time.getMonth() + 1}`.padStart(2, "0");
+    const day = `${time.getDate()}`.padStart(2, "0");
 
     return `${year}-${month}-${day}-${index}-${fileName}.log`;
   };
@@ -16,11 +16,15 @@ const createRotationLogStream = (
   folderName = "log",
   interval = "1d",
   maxFiles = 2,
-  fileName = folderName
+  fileName = folderName.split("/").pop()
 ) => {
   return rfs.createStream(createGenerator(fileName), {
     interval,
-    path: path.join(process.cwd(), "logs", `${folderName}s`),
+    path: path.join(
+      process.cwd(),
+      "logs",
+      `${folderName}s`
+    ),
     maxFiles,
     // compress: "gzip", // сжатие старых файлов
   });
