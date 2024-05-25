@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  form(method="POST")
+    .group
+      label(for="title") Title
+      input(type="text" placeholder="enter the title" name="title" required)
+    .group
+      label(for="type") Video Type
+      input(type="text" placeholder="episode OR series" name="type" required)
+    .group
+      label(for="episode_number") Episode #
+      input(type="number" placeholder="####" name="episode_number" required)
+    button(type="submit") Save New Video

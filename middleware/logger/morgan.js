@@ -17,26 +17,13 @@ const logMassageFormat = "':date' [:method] :url :status";
 const morganAllLoggerConsole = morgan(logMassageFormat);
 
 const morganAllLoggerServer = morgan(logMassageFormat, {
-  stream: createRotationLogStream("server/info",),
+  stream: createRotationLogStream("info"),
 });
 
 const morganErrorLoggerServer = morgan(
   `${logMassageFormat} \n:body`,
   {
-    stream: createRotationLogStream("server/error",),
-    skip: function (req, res) {
-      return res.statusCode < 400;
-    },
-  }
-);
-const morganAllLoggerClient = morgan(logMassageFormat, {
-  stream: createRotationLogStream("client/info",),
-});
-
-const morganErrorLoggerClient = morgan(
-  `${logMassageFormat} \n:body`,
-  {
-    stream: createRotationLogStream("client/error",),
+    stream: createRotationLogStream("error"),
     skip: function (req, res) {
       return res.statusCode < 400;
     },
@@ -48,6 +35,4 @@ module.exports = {
   morganAllLoggerServer,
   morganAllLoggerConsole,
   morganErrorLoggerServer,
-  morganAllLoggerClient,
-  morganErrorLoggerClient,
 };

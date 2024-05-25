@@ -1,0 +1,19 @@
+extends layout
+
+block headContent
+  script(src="/pressme_button.js" type="module")
+
+block content
+  div#root
+    table.mainTable
+      thead
+        each headerItem in ["ID", "Title", "Type", "Episode"]
+          th(class=headerItem.toLowerCase())= headerItem
+      tbody
+        each videoItem in locals.videosList
+          tr
+            td= videoItem.id
+            td= videoItem.title
+            td= videoItem.type
+            td= videoItem.episode_number
+    button#pressme Press me
