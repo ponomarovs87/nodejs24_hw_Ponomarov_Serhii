@@ -2,7 +2,7 @@ const yup = require("yup");
 
 const onlyNumbersRegex = /^\d+$/;
 
-//todo пофиксить [DELETE] /users/91.0 204 должно быть 400
+//todo переделать [DELETE] /users/91.0 204 должно быть 400
 
 const userIdSchema = yup.object({
   userId: yup
