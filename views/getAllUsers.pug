@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    //- h1 Я изобрел php на js коде Ураа!!!
+    div.allUsers
+      table.mainTable
+        thead
+          each headerItem in ["ID", "Full name", "Current age", "Email"]
+            th(class=headerItem.toLowerCase())= headerItem
+        tbody
+          each user in locals.usersArray
+            tr
+              td= user.id
+              td= user.fullName
+              td= user.age
+              td= user.mail
