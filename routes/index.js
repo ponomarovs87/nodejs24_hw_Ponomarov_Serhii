@@ -22,16 +22,14 @@ router.use("/healthcheck", (req, res) => {
   res.status(404).send({ errors: "page not found" });
 });
 
-router.post(
-  "/addNewUser",
-  formDataParser,
-  createUser
-);
-
+router.post("/addNewUser", formDataParser, createUser);
 
 router.get("/:page", (req, res) => {
   const usersArray = usersBase.getAllUsers();
   const requestedPage = req.params.page;
+  if (requestedPage === "404") {
+    res.status(404).render("404");
+  }
   res.render(requestedPage, { usersArray }, (err, html) => {
     if (err) {
       return res.redirect("/404");
@@ -40,8 +38,8 @@ router.get("/:page", (req, res) => {
   });
 });
 
-router.use((_req,res)=>{
-  return res.redirect("/404")
-})
+router.use((_req, res) => {
+  return res.redirect("/404");
+});
 
 module.exports = router;
