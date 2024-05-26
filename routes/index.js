@@ -40,4 +40,8 @@ router.get("/:page", (req, res) => {
   });
 });
 
+router.use((_req,res)=>{
+  return res.redirect("/404")
+})
+
 module.exports = router;
