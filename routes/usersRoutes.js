@@ -4,7 +4,9 @@ const usersRoutes = express.Router();
 const {
   userIdValidator,
 } = require("../middleware/validation/userId-validation");
-const { userCreateValidator } = require("../middleware/validation/user-validation");
+const {
+  userCreateValidator,
+} = require("../middleware/validation/user-validation");
 
 usersRoutes.get("/", (_req, res) => {
   res.send({ answer: [] });
