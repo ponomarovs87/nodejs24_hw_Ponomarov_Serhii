@@ -1,14 +1,20 @@
 const yup = require("yup");
 
-const nameRegex = /^(?=.*\b\w{2,}\b.*\b\w{2,}\b).*$/;
+const nameRegex = /^[a-zA-Zа-яА-Я]+$/; 
 
 const userCreateSchema = yup.object({
-  username: yup
+  fullName: yup
     .string()
     .required("Полное имя обязательно")
-    .matches(
-      nameRegex,
-      "Полное имя должно быть минимум из имени и фамилии, каждое из которых должно быть минимум из 2х символов"
+    .test(
+      "is-valid-fullName",
+      "Полное имя должно быть минимум из имени и фамилии, каждое из которых должно быть минимум из 2х символов",
+      (value) => {
+        if (!value) return false; 
+        const nameParts = value.trim().split(" ");
+        if (nameParts.length !== 2) return false;
+        return nameParts.every(part => nameRegex.test(part));
+      }
     )
     .transform((value) =>
       value
@@ -36,9 +42,26 @@ const userCreateSchema = yup.object({
         );
       }
     ),
+  birthDate: yup
+    .date()
+    .required("Дата рождения обязательна")
+    .transform((value, originalValue) => {
+      return new Date(originalValue);
+    })
+    .test(
+      "is-valid-birthdate",
+      "Дата рождения должна быть в формате 'YYYY-MM-DD'",
+      (value) => {
+        return !isNaN(value.getTime());
+      }
+    )
+    .max(
+      new Date(),
+      "Дата рождения не может быть в будущем"
+    ),
 });
 
-const userCreateValidator = async (req, res, next) => {
+const userCreateValidator = async (req, _res, next) => {
   try {
     req.body = await userCreateSchema.validate(req.body, {
       abortEarly: false,
@@ -53,7 +76,7 @@ const userCreateValidator = async (req, res, next) => {
       }
       errors[error.path].push(error.message);
     });
-    res.status(400).send({ errors });
+    throw { status: 400, errors };
   }
 };
 
