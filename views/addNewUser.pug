@@ -22,7 +22,7 @@ block content
 
     .group
       label(for="email") @Mail 
-      input(type="text" placeholder="myMail@ukr.net" name="email" required value=(formData && formData.email))
+      input(type="email" placeholder="myMail@ukr.net" name="email" required value=(formData && formData.email))
 
     - const emailErrors = errors && errors.email ? errors.email : [];
     if (emailErrors.length > 0)
