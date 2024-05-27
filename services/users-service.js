@@ -1,7 +1,6 @@
 //Абстракция
 class UsersBaseSchema {
   userList = [];
-  constructor() {}
   createNewUser(name, surname, birthDate, mail) {
     const user = new UserSchema(
       name,
