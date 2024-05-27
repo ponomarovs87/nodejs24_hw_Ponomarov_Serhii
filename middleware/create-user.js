@@ -7,8 +7,7 @@ const createUser = async (req, res) => {
   console.log();
   try {
     await userCreateValidator(req, res, async () => {
-      const name = req.body.fullName.split(" ")[0];
-      const surname = req.body.fullName.split(" ")[1];
+      const [name, surname] = req.body.fullName.split(" ");
       const birthDate = req.body.birthDate;
       const email = req.body.email;
 
