@@ -7,6 +7,9 @@ const formDataParser = express.urlencoded({
 const usersRoutes = require("./usersRoutes");
 const { usersBase } = require("../services/users-service");
 const { createUser } = require("../middleware/create-user");
+const {
+  renderAbstractionPage,
+} = require("../middleware/renderAbstractionPage");
 
 router.get("/", (_req, res) => {
   res.render("index");
@@ -18,26 +21,23 @@ router.get("/healthcheck", (req, res) => {
   res.send({ answer: "healthcheck passed" });
 });
 
-router.use("/healthcheck", (req, res) => {
-  res.status(404).send({ errors: "page not found" });
-});
-
 router.post("/addNewUser", formDataParser, createUser);
 
 router.get("/:page", (req, res) => {
-  const usersArray = usersBase.getAllUsers();
   const requestedPage = req.params.page;
-  
-  if (requestedPage === "404") {
-    return res.status(404).render("404");
-  }
 
-  res.render(requestedPage, { usersArray }, (err, html) => {
-    if (err) {
-      return res.redirect("/404");
-    }
-    res.send(html);
-  });
+  switch (requestedPage) {
+    case "getAllUsers":
+      const usersArray = usersBase.getAllUsers();
+      renderAbstractionPage(req, res, requestedPage, {
+        usersArray,
+      });
+      break;
+
+    default:
+      renderAbstractionPage(req, res, requestedPage);
+      break;
+  }
 });
 
 router.use((_req, res) => {
