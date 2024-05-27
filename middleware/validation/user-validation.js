@@ -1,6 +1,6 @@
 const yup = require("yup");
 
-const nameRegex = /^[a-zA-Zа-яА-Я]+$/; 
+const nameRegex = /^[a-zA-Zа-яА-Я]+$/;
 
 const userCreateSchema = yup.object({
   fullName: yup
@@ -8,12 +8,14 @@ const userCreateSchema = yup.object({
     .required("Полное имя обязательно")
     .test(
       "is-valid-fullName",
-      "Полное имя должно быть минимум из имени и фамилии, каждое из которых должно быть минимум из 2х символов",
+      "Полное имя должно состоять из имени и фамилии, каждое из которых должно быть минимум из 2х символов",
       (value) => {
-        if (!value) return false; 
+        if (!value) return false;
         const nameParts = value.trim().split(" ");
         if (nameParts.length !== 2) return false;
-        return nameParts.every(part => nameRegex.test(part));
+        return nameParts.every((part) =>
+          nameRegex.test(part)
+        );
       }
     )
     .transform((value) =>
@@ -32,7 +34,7 @@ const userCreateSchema = yup.object({
     .email("неправильный формат почты")
     .test(
       "is-valid-email",
-      "адрес поты должен быть минимум из 2х символов",
+      "адрес поты быть верно написан например : example@mail.com",
       (value) => {
         const [localPart, domain] = value.split("@");
         return (
@@ -61,7 +63,7 @@ const userCreateSchema = yup.object({
     ),
 });
 
-const userCreateValidator = async (req, _res, next) => {
+const userCreateValidator = async (req, res, next) => {
   try {
     req.body = await userCreateSchema.validate(req.body, {
       abortEarly: false,
@@ -76,7 +78,11 @@ const userCreateValidator = async (req, _res, next) => {
       }
       errors[error.path].push(error.message);
     });
-    throw { status: 400, errors };
+    return res.status(400).render("addNewUser", {
+      layout: "layout",
+      formData: req.body,
+      errors,
+    });
   }
 };
 

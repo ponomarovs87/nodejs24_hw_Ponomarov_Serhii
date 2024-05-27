@@ -10,6 +10,9 @@ const { createUser } = require("../middleware/create-user");
 const {
   renderAbstractionPage,
 } = require("../middleware/renderAbstractionPage");
+const {
+  userCreateValidator,
+} = require("../middleware/validation/user-validation");
 
 router.get("/", (_req, res) => {
   res.render("index");
@@ -21,7 +24,12 @@ router.get("/healthcheck", (req, res) => {
   res.send({ answer: "healthcheck passed" });
 });
 
-router.post("/addNewUser", formDataParser, createUser);
+router.post(
+  "/addNewUser",
+  formDataParser,
+  userCreateValidator,
+  createUser
+);
 
 router.get("/:page", (req, res) => {
   const requestedPage = req.params.page;
