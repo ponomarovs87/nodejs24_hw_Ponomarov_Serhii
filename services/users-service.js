@@ -18,8 +18,9 @@ class UsersBaseSchema {
     return this.userList.map((user) => ({
       id: user.id,
       fullName: `${user.name} ${user.surname}`,
-      age: new Date().getFullYear() -
-      new Date(user.birthDate).getFullYear(),
+      age:
+        new Date().getFullYear() -
+        new Date(user.birthDate).getFullYear(),
       mail: user.mail,
     }));
   }
@@ -36,7 +37,6 @@ class UserSchema {
   _setId(id) {
     this.id = id;
   }
-
 }
 const user1 = new UserSchema(
   "Vasya",
