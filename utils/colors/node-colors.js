@@ -48,14 +48,18 @@ const setTheme = (text, ...themes) => {
     if (!themes) {
       return [
         ...text.map((item) =>
-          typeof item === "object" ? JSON.stringify(item) : item
+          typeof item === "object"
+            ? JSON.stringify(item)
+            : item
         ),
       ];
     }
     return [
       themes.join(""),
       ...text.map((item) =>
-        typeof item === "object" ? JSON.stringify(item) : item
+        typeof item === "object"
+          ? JSON.stringify(item)
+          : item
       ),
       styles.reset,
     ].join(" ");

@@ -1,15 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const formDataParser = express.urlencoded({
+  extended: false,
+});
 
 const usersRoutes = require("./usersRoutes");
-// const {
-  // userCreateValidator,
-// } = require("../middleware/validation/user-validation");
+const { usersBase } = require("../services/users-service");
+const { createUser } = require("../middleware/create-user");
+const {
+  renderAbstractionPage,
+} = require("../middleware/renderAbstractionPage");
+const {
+  userCreateValidator,
+} = require("../middleware/validation/user-validation");
 
-//! опционально в таске было написанное с s но s другим шрифтом
-// router.post("/user", userCreateValidator, (req, res) => {
-//   res.status(201).send({ answer: "User created" });
-// });
+router.get("/", (_req, res) => {
+  res.render("index");
+});
 
 router.use("/users", usersRoutes);
 
@@ -17,8 +24,32 @@ router.get("/healthcheck", (req, res) => {
   res.send({ answer: "healthcheck passed" });
 });
 
-router.use("/healthcheck", (req, res) => {
-  res.status(404).send({ errors: "page not found" });
+router.post(
+  "/addNewUser",
+  formDataParser,
+  userCreateValidator,
+  createUser
+);
+
+router.get("/:page", (req, res) => {
+  const requestedPage = req.params.page;
+
+  switch (requestedPage) {
+    case "getAllUsers":
+      const usersArray = usersBase.getAllUsers();
+      renderAbstractionPage(req, res, requestedPage, {
+        usersArray,
+      });
+      break;
+
+    default:
+      renderAbstractionPage(req, res, requestedPage);
+      break;
+  }
+});
+
+router.use((_req, res) => {
+  return res.redirect("/404");
 });
 
 module.exports = router;

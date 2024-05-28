@@ -37,328 +37,226 @@ function generateRandomString(characters, maxLetters = 50) {
   return result;
 }
 
-//! Включить при необходимости проверки и измения ендпоинта
-// describe("task6(server-express) /user collection", () => {
-//   // Test for randomMethod /user
-//   for (let i = 0; i < httpMethods.length; i++) {
-//     const randomMethod = [httpMethods[i]];
-//     if (randomMethod[0] === "post") {
-//       it("should return 201 status and 'User created' message", (done) => {
-//         const userData = {
-//           username: "jonh sMitH",
-//           email: "mail2@server.com",
-//         };
+const myUniversalTest = ({
+  testName,
+  method,
+  endpoint,
+  requestData,
+  expectCode,
+  expects
+}) => {
+  it(testName, (done) => {
+    const request = supertest(server)[method](endpoint);
+    
+    if (requestData) {
+      request.send(requestData);
+    }
+    
+    request.expect(expectCode).end((err, res) => {
+      expects.forEach(expectFn => expectFn(err, res));
+      done();
+    });
+  });
+};
 
-//         supertest(server)
-//           .post("/user")
-//           .send(userData)
-//           .expect(201)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(201);
-//             expect(res.text).to.include("User created");
-//             done();
-//           });
-//       });
-//       it(`${randomMethod[0]} /user with missing fields should return 400 status and errors`, (done) => {
-//         supertest(server)
-//           [randomMethod[0]]("/user")
-//           .send({})
-//           .expect(400)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(400);
-//             expect(res.text).to.include("errors");
-//             expect(res.text).to.have.include("username");
-//             expect(res.text).to.have.include("email");
-//             done();
-//           });
-//       });
-//       it(`${randomMethod[0]} /user with missing 'username' fields should return 400 status and errors`, (done) => {
-//         supertest(server)
-//           [randomMethod[0]]("/user")
-//           .send({ email: "mail2@server.com" })
-//           .expect(400)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(400);
-//             expect(res.text).to.include("errors");
-//             expect(res.text).to.have.include("username");
-//             done();
-//           });
-//       });
-//       it(`${randomMethod[0]} /user with missing 'email' fields should return 400 status and errors`, (done) => {
-//         supertest(server)
-//           [randomMethod[0]]("/user")
-//           .send({ username: "jonh sMitH" })
-//           .expect(400)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(400);
-//             expect(res.text).to.include("errors");
-//             expect(res.text).to.have.include("email");
-//             done();
-//           });
-//       });
-//       it(`${randomMethod[0]} /user with incorrect fields should return 400 status and errors`, (done) => {
-//         supertest(server)
-//           [randomMethod[0]]("/user")
-//           .send({
-//             name: "jonh sMitH",
-//             mail: "test@mail.test",
-//           })
-//           .expect(400)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(400);
-//             expect(res.text).to.include("errors");
-//             expect(res.text).to.have.include("username");
-//             expect(res.text).to.have.include("email");
-//             done();
-//           });
-//       });
-//     } else {
-//       it(`${randomMethod} /user should return 404 status`, (done) => {
-//         supertest(server)
-//           [httpMethods[i]]("/user")
-//           .expect(404)
-//           .end((err, res) => {
-//             expect(err).to.be.null;
-//             expect(res).to.have.status(404);
-//             done();
-//           });
-//       });
-//     }
-//   }
-// });
 
 describe("task6(server-express) /users collection", () => {
   for (let i = 0; i < httpMethods.length; i++) {
-    const randomMethod = [httpMethods[i]];
-    if (randomMethod[0] === "get") {
+    const method = httpMethods[i];
+    
+    if (method === "get") {
       for (let i = 0; i < randomTestCounter; i++) {
-        const validUserId = generateRandomString(
-          charactersNumbers
-        );
-        const invalidUserId = generateRandomString(
-          charactersLetters
-        );
-        const invalidNumberUserId = `${generateRandomString(
-          charactersNumbers,
-          5
-        )}.${generateRandomString(charactersNumbers, 3)}`;
-        it(`GET /users/:id should return 200 status and include 'userId: ${validUserId}'`, (done) => {
-          // example of a valid userId
-          supertest(server)
-            [randomMethod[0]](`/users/${validUserId}`)
-            .expect(200)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(200);
-              expect(res.text).to.include(
-                `"userId":"${validUserId}"`
-              );
-              done();
-            });
+        const validUserId = generateRandomString(charactersNumbers);
+        const invalidUserId = generateRandomString(charactersLetters);
+        const invalidNumberUserId = `${generateRandomString(charactersNumbers, 5)}.${generateRandomString(charactersNumbers, 3)}`;
+        
+        myUniversalTest({
+          testName: `GET /users/:id should return 200 status and include 'userId: ${validUserId}'`,
+          method,
+          endpoint: `/users/${validUserId}`,
+          expectCode: 200,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(200),
+            (err, res) => expect(res.text).to.include(`"userId":"${validUserId}"`)
+          ]
         });
-        it(`${randomMethod[0]} /users/:id with invalid ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            [randomMethod[0]](`/users/${invalidUserId}`)
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include([
-                "Поле должно содержать только цифры",
-              ]);
-              done();
-            });
+
+        myUniversalTest({
+          testName: `GET /users/:id with invalid ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/${invalidUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("Поле должно содержать только цифры")
+          ]
         });
-        it(`${randomMethod[0]} /users/${invalidNumberUserId} with invalidNumber ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            [randomMethod[0]](
-              `/users/${invalidNumberUserId}`
-            )
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include(
-                "Поле должно быть целым числом"
-              );
-              done();
-            });
+
+        myUniversalTest({
+          testName: `GET /users/${invalidNumberUserId} with invalidNumber ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/${invalidNumberUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("Поле должно быть целым числом")
+          ]
         });
-        it(`${randomMethod[0]} /users/:id with negative number ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            [randomMethod[0]](
-              `/users/-${invalidNumberUserId}`
-            )
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include(
-                "значение должно быть позитивным и более 0"
-              );
-              done();
-            });
+
+        myUniversalTest({
+          testName: `GET /users/-${invalidNumberUserId} with negative number ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/-${invalidNumberUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("значение должно быть позитивным и более 0")
+          ]
         });
       }
-    } else if (randomMethod[0] === "post") {
-      it("should return 201 status and 'User created' message", (done) => {
-        const userData = {
-          username: "jonh sMitH",
-          email: "mail2@server.com",
-        };
+    } else if (method === "post") {
+      myUniversalTest({
+        testName: `POST /users should return 201 status and 'User created' message`,
+        method,
+        endpoint: `/users`,
+        requestData: { username: "jonh sMitH", email: "mail2@server.com" },
+        expectCode: 201,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(201),
+          (err, res) => expect(res.text).to.include("User created")
+        ]
+      });
 
-        supertest(server)
-          .post("/users")
-          .send(userData)
-          .expect(201)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(201);
-            expect(res.text).to.include("User created");
-            done();
-          });
+      myUniversalTest({
+        testName: `POST /users with missing fields should return 400 status and errors`,
+        method,
+        endpoint: `/users`,
+        requestData: {},
+        expectCode: 400,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(400),
+          (err, res) => expect(res.text).to.include("errors"),
+          (err, res) => expect(res.text).to.include("username"),
+          (err, res) => expect(res.text).to.include("email")
+        ]
       });
-      it(`${randomMethod[0]} /user with missing fields should return 400 status and errors`, (done) => {
-        supertest(server)
-          [randomMethod[0]]("/users")
-          .send({})
-          .expect(400)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(400);
-            expect(res.text).to.include("errors");
-            expect(res.text).to.have.include("username");
-            expect(res.text).to.have.include("email");
-            done();
-          });
+
+      myUniversalTest({
+        testName: `POST /users with missing 'username' fields should return 400 status and errors`,
+        method,
+        endpoint: `/users`,
+        requestData: { email: "mail2@server.com" },
+        expectCode: 400,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(400),
+          (err, res) => expect(res.text).to.include("errors"),
+          (err, res) => expect(res.text).to.include("username")
+        ]
       });
-      it(`${randomMethod[0]} /user with missing 'username' fields should return 400 status and errors`, (done) => {
-        supertest(server)
-          [randomMethod[0]]("/users")
-          .send({ email: "mail2@server.com" })
-          .expect(400)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(400);
-            expect(res.text).to.include("errors");
-            expect(res.text).to.have.include("username");
-            done();
-          });
+
+      myUniversalTest({
+        testName: `POST /users with missing 'email' fields should return 400 status and errors`,
+        method,
+        endpoint: `/users`,
+        requestData: { username: "jonh sMitH" },
+        expectCode: 400,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(400),
+          (err, res) => expect(res.text).to.include("errors"),
+          (err, res) => expect(res.text).to.include("email")
+        ]
       });
-      it(`${randomMethod[0]} /user with missing 'email' fields should return 400 status and errors`, (done) => {
-        supertest(server)
-          [randomMethod[0]]("/users")
-          .send({ username: "jonh sMitH" })
-          .expect(400)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(400);
-            expect(res.text).to.include("errors");
-            expect(res.text).to.have.include("email");
-            done();
-          });
+
+      myUniversalTest({
+        testName: `POST /users with incorrect fields should return 400 status and errors`,
+        method,
+        endpoint: `/users`,
+        requestData: { name: "jonh sMitH", mail: "test@mail.test" },
+        expectCode: 400,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(400),
+          (err, res) => expect(res.text).to.include("errors"),
+          (err, res) => expect(res.text).to.include("username"),
+          (err, res) => expect(res.text).to.include("email")
+        ]
       });
-      it(`${randomMethod[0]} /user with incorrect fields should return 400 status and errors`, (done) => {
-        supertest(server)
-          [randomMethod[0]]("/users")
-          .send({
-            name: "jonh sMitH",
-            mail: "test@mail.test",
-          })
-          .expect(400)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(400);
-            expect(res.text).to.include("errors");
-            expect(res.text).to.have.include("username");
-            expect(res.text).to.have.include("email");
-            done();
-          });
-      });
-    } else if (randomMethod[0] === "delete") {
+    } else if (method === "delete") {
       for (let i = 0; i < randomTestCounter; i++) {
-        const validUserId = generateRandomString(
-          charactersNumbers
-        );
-        const invalidUserId = generateRandomString(
-          charactersLetters
-        );
-        const invalidNumberUserId = `${generateRandomString(
-          charactersNumbers,
-          5
-        )}.${generateRandomString(charactersNumbers, 3)}`;
-        it(`${randomMethod[0]} /users/${validUserId} should return 204 status && res.body === empty`, (done) => {
-          // example of a valid userId
-          supertest(server)
-            [randomMethod[0]](`/users/${validUserId}`)
-            .expect(204)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(204);
-              expect(res.text).to.be.empty;
-              done();
-            });
+        const validUserId = generateRandomString(charactersNumbers);
+        const invalidUserId = generateRandomString(charactersLetters);
+        const invalidNumberUserId = `${generateRandomString(charactersNumbers, 5)}.${generateRandomString(charactersNumbers, 3)}`;
+
+        myUniversalTest({
+          testName: `DELETE /users/${validUserId} should return 204 status and res.body === empty`,
+          method,
+          endpoint: `/users/${validUserId}`,
+          expectCode: 204,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(204),
+            (err, res) => expect(res.text).to.be.empty
+          ]
         });
-        it(`DELETE /users/${invalidUserId} with invalid ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            .delete(`/users/${invalidUserId}`)
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include([
-                "Поле должно содержать только цифры",
-              ]);
-              done();
-            });
+
+        myUniversalTest({
+          testName: `DELETE /users/${invalidUserId} with invalid ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/${invalidUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("Поле должно содержать только цифры")
+          ]
         });
-        it(`DELETE /users/${invalidNumberUserId} with invalidNumber ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            .delete(`/users/${invalidNumberUserId}`)
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include(
-                "Поле должно быть целым числом"
-              );
-              done();
-            });
+
+        myUniversalTest({
+          testName: `DELETE /users/${invalidNumberUserId} with invalidNumber ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/${invalidNumberUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("Поле должно быть целым числом")
+          ]
         });
-        it(`DELETE /users/-${invalidNumberUserId} with negative number ID should return 400 status and error message`, (done) => {
-          supertest(server)
-            .delete(`/users/-${invalidNumberUserId}`)
-            .expect(400)
-            .end((err, res) => {
-              expect(err).to.be.null;
-              expect(res).to.have.status(400);
-              expect(res.text).to.include(
-                "значение должно быть позитивным и более 0"
-              );
-              done();
-            });
+
+        myUniversalTest({
+          testName: `DELETE /users/-${invalidNumberUserId} with negative number ID should return 400 status and error message`,
+          method,
+          endpoint: `/users/-${invalidNumberUserId}`,
+          expectCode: 400,
+          expects: [
+            (err, res) => expect(err).to.be.null,
+            (err, res) => expect(res).to.have.status(400),
+            (err, res) => expect(res.text).to.include("значение должно быть позитивным и более 0")
+          ]
         });
       }
     } else {
-      const validUserId = Math.floor(
-        Math.random() * Number.MAX_SAFE_INTEGER
-      );
-      it(`${randomMethod[0]} /users/${validUserId} should return 404 status`, (done) => {
-        // example of a valid userId
-        supertest(server)
-          [randomMethod[0]](`/users/${validUserId}`)
-          .expect(404)
-          .end((err, res) => {
-            expect(err).to.be.null;
-            expect(res).to.have.status(404);
-            done();
-          });
+      const validUserId = generateRandomString(charactersNumbers);
+
+      myUniversalTest({
+        testName: `${method.toUpperCase()} /users/${validUserId} should return 404 status`,
+        method,
+        endpoint: `/users/${validUserId}`,
+        expectCode: 404,
+        expects: [
+          (err, res) => expect(err).to.be.null,
+          (err, res) => expect(res).to.have.status(404)
+        ]
       });
     }
   }
 });
+

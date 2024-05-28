@@ -2,14 +2,16 @@ const yup = require("yup");
 
 const onlyNumbersRegex = /^\d+$/;
 
+//todo переделать [DELETE] /users/91.0 204 должно быть 400
+
 const userIdSchema = yup.object({
-    userId: yup
-      .string()
-      .required('Поле обязательно')
-      .matches(onlyNumbersRegex, 'Поле должно содержать только цифры')
-      .test('is-integer', 'Поле должно быть целым числом', (value) => Number.isInteger(Number(value)))
-      .test('is-positive', 'значение должно быть позитивным и более 0', (value) => parseFloat(value) > 0),
-  });
+  userId: yup
+    .number()
+    .label("userId")
+    .typeError("Поле должно содержать только цифры")
+    .integer("Поле должно быть целым числом")
+    .positive("значение должно быть позитивным и более 0"),
+});
 
 const userIdValidator = async (req, res, next) => {
   try {

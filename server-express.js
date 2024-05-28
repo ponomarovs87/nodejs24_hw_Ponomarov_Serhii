@@ -2,7 +2,12 @@ require("dotenv").config();
 const { server } = require("config");
 
 const express = require("express");
-const morganLogger = require("./middleware/logger/morgan");
+const {
+  captureResponseBody,
+  morganAllLoggerServer,
+  morganAllLoggerConsole,
+  morganErrorLoggerServer,
+} = require("./middleware/logger/morgan");
 
 const routes = require("./routes/index");
 
@@ -10,15 +15,26 @@ const myLogger = require("./utils/logger")(
   "Server-Express"
 );
 
-const app = express();
+const app = express(); // 3000 база данных подключение для изменения и добавления в бд
 
-app.use(express.json());// подключение парсера json
+app.use(express.json()); // подключение парсера json
 
 app.listen(server.port, () => {
-  myLogger.info(`listening on ${server.port}`);
+  myLogger.info(
+    `listening Server on ${server.host}:${server.port}`
+  );
 });
 
-app.use(morganLogger); //подключение логгера моргана
+[
+  captureResponseBody,
+  morganAllLoggerServer,
+  morganAllLoggerConsole,
+  morganErrorLoggerServer,
+].forEach((item) => app.use(item));
+
+app.set("view engine", "pug");
+
+app.use(express.static("static"));
 
 app.use("/", routes);
 
